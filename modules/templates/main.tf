@@ -1,262 +1,178 @@
-#--------------------------------------------------------------------------------------------------------
-# service plan
-#--------------------------------------------------------------------------------------------------------
-resource "azurerm_service_plan" "service_plan" {
-  name                = var.service_plan_name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  os_type             = var.os_type
-  sku_name            = var.sku_name
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+#---------------------------------------------------------
+# Resource Group Creation or selection - Default is "false"
+#----------------------------------------------------------
+data "azurerm_resource_group" "rgrp" {
+  count = var.create_resource_group ? 0 : 1
+  name  = var.resource_group_name
 }
 
-#--------------------------------------------------------------------------------------------------------
-# linux function
-#--------------------------------------------------------------------------------------------------------
-resource "azurerm_linux_function_app" "linux_function_app" {
-  count                      = var.os_type == "Linux" ? 1 : 0
-  name                       = var.function_name
-  location                   = var.location
-  resource_group_name        = var.resource_group_name
-  service_plan_id            = azurerm_service_plan.service_plan.id
-  storage_account_name       = var.storage_account_name
-  storage_account_access_key = var.storage_primary_access_key
+resource "azurerm_resource_group" "rg" {
+  count    = var.create_resource_group ? 1 : 0
+  name     = lower(var.resource_group_name)
+  location = var.location
+  tags     = var.tags
+}
+
+data "azurerm_log_analytics_workspace" "logws" {
+  count               = var.log_analytics_workspace_name != null ? 1 : 0
+  name                = var.log_analytics_workspace_name
+  resource_group_name = var.resource_group_name
+}
+
+data "azurerm_storage_account" "storeacc" {
+  count               = var.storage_account_name != null ? 1 : 0
+  name                = var.storage_account_name
+  resource_group_name = var.resource_group_name
+}
+
+#---------------------------------------------------------
+# Container Registry Resource - Default is "true"
+#----------------------------------------------------------
+
+resource "azurerm_container_registry" "main" {
+  name                          = var.container_registry_config.name
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
+  admin_enabled                 = var.container_registry_config.admin_enabled
+  sku                           = var.container_registry_config.sku
   public_network_access_enabled = false
-  virtual_network_subnet_id  = var.subnet_name
-  ftp_publish_basic_authentication_enabled = false
-  
-  dynamic "site_config" {
-    for_each = var.site_config
+  quarantine_policy_enabled     = var.container_registry_config.quarantine_policy_enabled
+  zone_redundancy_enabled       = var.container_registry_config.zone_redundancy_enabled
+  tags                          = var.tags
+
+  dynamic "georeplications" {
+    for_each = var.georeplications
     content {
-      vnet_route_all_enabled            = true
-      always_on                         = lookup(site_config.value, "always_on", null)
-      api_definition_url                = lookup(site_config.value, "api_definition_url", null)
-      api_management_api_id             = lookup(site_config.value, "api_management_api_id", null)
-      app_command_line                  = lookup(site_config.value, "app_command_line", null)
-      app_scale_limit                   = lookup(site_config.value, "app_scale_limit", null)
-      default_documents                 = lookup(site_config.value, "default_documents", null)
-      ftps_state                        = lookup(site_config.value, "ftps_state", "Disabled")
-      health_check_path                 = lookup(site_config.value, "health_check_path", null)
-      health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", null)
-      http2_enabled                     = lookup(site_config.value, "http2_enabled", null)
-      load_balancing_mode               = lookup(site_config.value, "load_balancing_mode", null)
-      managed_pipeline_mode             = lookup(site_config.value, "managed_pipeline_mode", null)
-      minimum_tls_version               = lookup(site_config.value, "minimum_tls_version", lookup(site_config.value, "min_tls_version", "1.2"))
-      remote_debugging_enabled          = lookup(site_config.value, "remote_debugging_enabled", false)
-      remote_debugging_version          = lookup(site_config.value, "remote_debugging_version", null)
-      runtime_scale_monitoring_enabled  = lookup(site_config.value, "runtime_scale_monitoring_enabled", null)
-      use_32_bit_worker                 = lookup(site_config.value, "use_32_bit_worker", null)
-      websockets_enabled                = lookup(site_config.value, "websockets_enabled", false)
+      location                = georeplications.value.location
+      zone_redundancy_enabled = georeplications.value.zone_redundancy_enabled
+      tags                    = var.tags
+    }
+  }
 
-      application_insights_connection_string = lookup(site_config.value, "application_insights_connection_string", null)
-      application_insights_key               = lookup(site_config.value, "application_insights_key", false)
+  dynamic "network_rule_set" {
+    for_each = var.network_rule_set != null ? [var.network_rule_set] : []
+    content {
+      default_action = lookup(network_rule_set.value, "default_action", "Allow")
 
-      pre_warmed_instance_count = lookup(site_config.value, "pre_warmed_instance_count", null)
-      elastic_instance_minimum  = lookup(site_config.value, "elastic_instance_minimum", null)
-      worker_count              = lookup(site_config.value, "worker_count", null)
-
-      # Replace the dynamic "ip_restriction" block with these static ip_restriction blocks
-      ip_restriction {
-        name        = "Allow Azure Monitor"
-        service_tag = "AzureMonitor"
-        priority    = 100
-        action      = "Allow"
-      }
-
-      ip_restriction {
-        name        = "Allow Action Group"
-        service_tag = "ActionGroup"
-        priority    = 110
-        action      = "Allow"
-      }
-
-      ip_restriction {
-        name                     = "Deny internet"
-        ip_address               = "0.0.0.0/0"
-        virtual_network_subnet_id = null
-        priority                 = 120
-        action                   = "Deny"
-      }
-
-      dynamic "application_stack" {
-        for_each = lookup(site_config.value, "application_stack", null) == null ? [] : [site_config.value.application_stack]
+      dynamic "ip_rule" {
+        for_each = network_rule_set.value.ip_rule
         content {
-          dotnet_version              = lookup(application_stack.value, "dotnet_version", null)
-          java_version                = lookup(application_stack.value, "java_version", null)
-          node_version                = lookup(application_stack.value, "node_version", null)
-          python_version              = lookup(application_stack.value, "python_version", null)
-          powershell_core_version     = lookup(application_stack.value, "powershell_core_version", null)
+          action   = "Allow"
+          ip_range = ip_rule.value.ip_range
         }
       }
 
-      # dynamic "application_stack" {
-      #   for_each = lookup(site_config.value, "application_stack", null) == null ? [] : ["application_stack"]
-      #   content {
-      #     dynamic "docker" {
-      #       for_each = lookup(site_config.value.application_stack, "docker", null) == null ? [] : ["docker"]
-      #       content {
-      #         registry_url      = docker.value.registry_url
-      #         image_name        = docker.value.image_name
-      #         image_tag         = docker.value.image_tag
-      #         registry_username = docker.value.registry_username
-      #         registry_password = docker.value.registry_password
-      #       }
-      #     }
-
-      #     dotnet_version              = lookup(site_config.value.application_stack, "dotnet_version", null)
-      #     use_dotnet_isolated_runtime = lookup(site_config.value.application_stack, "use_dotnet_isolated_runtime", null)
-      #     java_version                = lookup(site_config.value.application_stack, "java_version", null)
-      #     node_version                = lookup(site_config.value.application_stack, "node_version", null)
-      #     python_version              = lookup(site_config.value.application_stack, "python_version", null)
-      #     powershell_core_version     = lookup(site_config.value.application_stack, "powershell_core_version", null)
-      #     use_custom_runtime          = lookup(site_config.value.application_stack, "use_custom_runtime", null)
-      #   }
-      # }
+      dynamic "virtual_network" {
+        for_each = network_rule_set.value.virtual_network
+        content {
+          action    = "Allow"
+          subnet_id = virtual_network.value.subnet_id
+        }
+      }
     }
   }
-  
+
+  dynamic "retention_policy" {
+    for_each = var.retention_policy != null ? [var.retention_policy] : []
+    content {
+      days    = lookup(retention_policy.value, "days", 7)
+      enabled = lookup(retention_policy.value, "enabled", true)
+    }
+  }
+
+  dynamic "trust_policy" {
+    for_each = var.enable_content_trust ? [1] : []
+    content {
+      enabled = var.enable_content_trust
+    }
+  }
+
+  identity {
+    type         = var.identity_ids != null ? "SystemAssigned, UserAssigned" : "SystemAssigned"
+    identity_ids = var.identity_ids
+  }
+
+  dynamic "encryption" {
+    for_each = var.encryption != null ? [var.encryption] : []
+    content {
+      enabled            = true
+      key_vault_key_id   = encryption.value.key_vault_key_id
+      identity_client_id = encryption.value.identity_client_id
+    }
+  }
+}
+
+#------------------------------------------------------------
+# Container Registry Resoruce Scope map - Default is "false"
+#------------------------------------------------------------
+
+resource "azurerm_container_registry_scope_map" "main" {
+  for_each                = var.scope_map != null ? { for k, v in var.scope_map : k => v if v != null } : {}
+  name                    = format("%s", each.key)
+  resource_group_name     = var.resource_group_name
+  container_registry_name = azurerm_container_registry.main.name
+  actions                 = each.value["actions"]
+}
+
+#------------------------------------------------------------
+# Container Registry Token  - Default is "false"
+#------------------------------------------------------------
+resource "azurerm_container_registry_token" "main" {
+  for_each                = var.scope_map != null ? { for k, v in var.scope_map : k => v if v != null } : {}
+  name                    = format("%s", "${each.key}-token")
+  resource_group_name     = var.resource_group_name
+  container_registry_name = azurerm_container_registry.main.name
+  scope_map_id            = element([for k in azurerm_container_registry_scope_map.main : k.id], 0)
+  enabled                 = true
+}
+
+#------------------------------------------------------------
+# Container Registry webhook - Default is "true"
+#------------------------------------------------------------
+resource "azurerm_container_registry_webhook" "main" {
+  for_each            = var.container_registry_webhooks != null ? { for k, v in var.container_registry_webhooks : k => v if v != null } : {}
+  name                = format("%s", each.key)
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  registry_name       = azurerm_container_registry.main.name
+  service_uri         = each.value["service_uri"]
+  actions             = each.value["actions"]
+  status              = each.value["status"]
+  scope               = each.value["scope"]
+  custom_headers      = each.value["custom_headers"]
   lifecycle {
     ignore_changes = [
-      sticky_settings,
-      site_config,
       tags
     ]
   }
 }
 
-#--------------------------------------------------------------------------------------------------------
-# Windows function
-#--------------------------------------------------------------------------------------------------------
-resource "azurerm_windows_function_app" "windows_function_app" {
-  count                      = var.os_type == "Windows" ? 1 : 0
-  name                       = var.function_name
-  location                   = var.location
-  resource_group_name        = var.resource_group_name
-  service_plan_id            = azurerm_service_plan.service_plan.id
-  storage_account_name       = var.storage_account_name
-  storage_account_access_key = var.storage_primary_access_key
-  public_network_access_enabled = false
-  virtual_network_subnet_id  = var.subnet_name
-  ftp_publish_basic_authentication_enabled = false
-
-
-
-  dynamic "site_config" {
-    for_each = var.site_config
-    content {
-      vnet_route_all_enabled            = true
-      always_on                         = lookup(site_config.value, "always_on", null)
-      api_definition_url                = lookup(site_config.value, "api_definition_url", null)
-      api_management_api_id             = lookup(site_config.value, "api_management_api_id", null)
-      app_command_line                  = lookup(site_config.value, "app_command_line", null)
-      app_scale_limit                   = lookup(site_config.value, "app_scale_limit", null)
-      default_documents                 = lookup(site_config.value, "default_documents", null)
-      ftps_state                        = lookup(site_config.value, "ftps_state", "Disabled")
-      health_check_path                 = lookup(site_config.value, "health_check_path", null)
-      health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", null)
-      http2_enabled                     = lookup(site_config.value, "http2_enabled", null)
-      load_balancing_mode               = lookup(site_config.value, "load_balancing_mode", null)
-      managed_pipeline_mode             = lookup(site_config.value, "managed_pipeline_mode", null)
-      minimum_tls_version               = lookup(site_config.value, "minimum_tls_version", lookup(site_config.value, "min_tls_version", "1.2"))
-      remote_debugging_enabled          = lookup(site_config.value, "remote_debugging_enabled", false)
-      remote_debugging_version          = lookup(site_config.value, "remote_debugging_version", null)
-      runtime_scale_monitoring_enabled  = lookup(site_config.value, "runtime_scale_monitoring_enabled", null)
-      use_32_bit_worker                 = lookup(site_config.value, "use_32_bit_worker", null)
-      websockets_enabled                = lookup(site_config.value, "websockets_enabled", false)
-
-      application_insights_connection_string = lookup(site_config.value, "application_insights_connection_string", null)
-      application_insights_key               = lookup(site_config.value, "application_insights_key", false)
-
-      pre_warmed_instance_count = lookup(site_config.value, "pre_warmed_instance_count", null)
-      elastic_instance_minimum  = lookup(site_config.value, "elastic_instance_minimum", null)
-      worker_count              = lookup(site_config.value, "worker_count", null)
-
-      # Replace the dynamic "ip_restriction" block with these static ip_restriction blocks
-      ip_restriction {
-        name        = "Allow Azure Monitor"
-        service_tag = "AzureMonitor"
-        priority    = 100
-        action      = "Allow"
-      }
-
-      ip_restriction {
-        name        = "Allow Action Group"
-        service_tag = "ActionGroup"
-        priority    = 110
-        action      = "Allow"
-      }
-
-      ip_restriction {
-        name                     = "Deny internet"
-        ip_address               = "0.0.0.0/0"
-        virtual_network_subnet_id = null
-        priority                 = 120
-        action                   = "Deny"
-      }
-
-      dynamic "application_stack" {
-        for_each = lookup(site_config.value, "application_stack", null) == null ? [] : [site_config.value.application_stack]
-        content {
-          dotnet_version              = lookup(application_stack.value, "dotnet_version", null)
-          java_version                = lookup(application_stack.value, "java_version", null)
-          node_version                = lookup(application_stack.value, "node_version", null)
-          powershell_core_version     = lookup(application_stack.value, "powershell_core_version", null)
-        }
-      }
-
-      // dynamic "application_stack" {
-      //   for_each = lookup(site_config.value, "application_stack", null) == null ? [] : ["application_stack"]
-      //   content {
-      //     dotnet_version              = lookup(site_config.application_stack, "dotnet_version", null)
-      //     use_dotnet_isolated_runtime = lookup(site_config.application_stack, "use_dotnet_isolated_runtime", null)
-
-      //     java_version            = lookup(site_config.application_stack, "java_version", null)
-      //     node_version            = lookup(site_config.application_stack, "node_version", null)
-      //     powershell_core_version = lookup(site_config.application_stack, "powershell_core_version", null)
-
-      //     use_custom_runtime = lookup(site_config.application_stack, "use_custom_runtime", null)
-      //   }
-      // }
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+data "azurerm_subnet" "sn" {
+  name                 = var.subnet_name
+  virtual_network_name = var.virtual_network_name
+  resource_group_name  = var.network_resource_group
 }
 
-#--------------------------------------------------------------------------------------------------------
-# private endpoint and DNS configuration
-#--------------------------------------------------------------------------------------------------------
-resource "azurerm_private_endpoint" "function_app_private_endpoint" {
-  name                = var.pe_name
+resource "azurerm_private_endpoint" "pep1" {
+  count               = var.enable_private_endpoint ? 1 : 0
+  name                = format("%s-private-endpoint", var.container_registry_config.name)
   location            = var.location
   resource_group_name = var.resource_group_name
-  subnet_id           = var.pe_subnet
+  subnet_id           = data.azurerm_subnet.sn.id
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+  private_dns_zone_group {
+    name                 = "container-registry-group"
+    private_dns_zone_ids = ["/subscriptions/<subscription_id>/resourceGroups/<rg_name>/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"]
+  }
 
   private_service_connection {
-    name                           = "${var.function_name}-privateserviceconnection"
+    name                           = "containerregistryprivatelink"
     is_manual_connection           = false
-    private_connection_resource_id = var.os_type == "Linux" ? azurerm_linux_function_app.linux_function_app[0].id : azurerm_windows_function_app.windows_function_app[0].id
-    subresource_names              = ["sites"]
-  }
-
-  private_dns_zone_group {
-    name                 = "privatelink.azurewebsites.net"
-    private_dns_zone_ids = ["/subscriptions/<subscription_id>/resourceGroups/<rg_name>/providers/Microsoft.Network/privateDnsZones/privatelink.azurewebsites.net"]
-  }
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
+    private_connection_resource_id = azurerm_container_registry.main.id
+    subresource_names              = ["registry"]
   }
 }
