@@ -2,6 +2,8 @@
 
 This repository contains an **AI-driven Terraform module generation and validation system**, utilizing **OpenAI, Gemini, DeepSeek, Claude, and Azure OpenAI** to create and auto-correct Terraform configurations.
 
+![CodeGeneration2](https://github.com/user-attachments/assets/23901c74-08bd-45b9-93ef-3002807d6315)
+
 ## 📌 Features
 ```
 - 🏗 Automated Terraform Code Generation**: AI generates Terraform configurations based on structured prompts.
