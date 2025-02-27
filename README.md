@@ -4,11 +4,11 @@ This repository contains an **AI-driven Terraform module generation and validati
 
 ## 📌 Features
 ```
-- 🏗 **Automated Terraform Code Generation**: AI generates Terraform configurations based on structured prompts.
-- 🔍 **Auto-Fixing of Terraform Errors**: Errors detected during validation are automatically corrected.
-- 🔄 **Git Integration**: Clones repositories, modifies files, and pushes changes to GitHub/GitLab.
-- 🏗 **Multi-Model AI Support**: Works with **OpenAI (GPT-4), Gemini, DeepSeek, Claude, and Azure OpenAI**.
-- 🛠 **CI/CD Ready**: Runs Terraform validation (`terraform validate`) and format checks (`terraform fmt`).
+- 🏗 Automated Terraform Code Generation**: AI generates Terraform configurations based on structured prompts.
+- 🔍 Auto-Fixing of Terraform Errors**: Errors detected during validation are automatically corrected.
+- 🔄 Git Integration: Clones repositories, modifies files, and pushes changes to GitHub/GitLab.
+- 🏗 Multi-Model AI Support: Works with OpenAI (GPT-4), Gemini, DeepSeek, Claude, and Azure OpenAI.
+- 🛠 CI/CD Ready: Runs Terraform validation (`terraform validate`) and format checks (`terraform fmt`).
 ```
 ## 📂 Project Structure
 ```
