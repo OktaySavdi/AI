@@ -33,7 +33,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 ### 2️⃣ Configure Environment Variables
-Create `a .env` file (or modify the existing one) and set API keys:
+Create a `.env` file (or modify the existing one) and set API keys:
 ```
 # Select the model provider to use
 MODEL_PROVIDER = "azure_openai"  # Options: "openai", "gemini", "deepseek", "claude", "azure_openai"
