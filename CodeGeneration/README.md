@@ -14,7 +14,7 @@ This repository contains an **AI-driven Terraform module generation and validati
 ```
 ## 📂 Project Structure
 ```
-📂 ai-terraform-generator 
+📂 CodeGeneration 
 │── 📂 git_repo/ # Cloned Git repository (Terraform modules live here) 
 │── 📄 main.py # Entry point (Runs AI workflow) 
 │── 📄 .env # API Keys and Configurations 
