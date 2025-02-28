@@ -27,10 +27,10 @@ This repository contains an **AI-driven Terraform module generation and validati
 
 ### 1️⃣ Install Required Packages
 ```sh
-sudo apt install python3.12-venv
+apt install python3.12-venv
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 ### 2️⃣ Configure Environment Variables
 Create a `.env` file (or modify the existing one) and set API keys:
