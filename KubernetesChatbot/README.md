@@ -3,9 +3,9 @@ This project is an AI-powered chatbot application designed to answer Kubernetes-
 
 🧠 The underlying model has been fine-tuned on a custom Kubernetes dataset, improving its accuracy and relevance for real-world use cases.
 
+https://github.com/user-attachments/assets/94e269d6-6a64-461f-88f7-491ba1c85de6
 
 ![2025-03-31 14_02_00-Kubernetes Agent Chatbot - Work - Microsoft​ Edge](https://github.com/user-attachments/assets/d43ee038-8f60-482e-8b28-3560eb0dfe4c)
-
 
 ![2025-03-28 14_49_11-k8s_chatbox _ Google AI Studio](https://github.com/user-attachments/assets/93fb49e3-e4e1-4943-b414-3cb53eaebdba)
 
