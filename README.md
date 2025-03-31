@@ -2,8 +2,6 @@
 
 This repository contains AI-powered tools and experiments developed for cloud infrastructure, DevOps automation, and Kubernetes operations leveraging large language models like OpenAI, Gemini, Claude, and DeepSeek.
 
-📁 Projects
-
 🔨 CodeGeneration
 
 An AI agent that automates Terraform module generation using fine-tuned LLMs. It simplifies cloud infrastructure provisioning through intelligent prompts, error correction, and GitOps workflows.
@@ -22,6 +20,7 @@ A chatbot application powered by a fine-tuned LLM, trained on Kubernetes knowled
  - ✅ Flask-based web UI
  - ✅ Docker-compatible deployment
 
+#
 🧠 Models Used
 
 This repo makes use of several LLMs for experimentation and deployment:
@@ -32,7 +31,3 @@ This repo makes use of several LLMs for experimentation and deployment:
  - DeepSeek 
  - Claude 
  - Azure OpenAI
-Azure OpenAI
-
-📜 License
-All projects in this repository are licensed under the MIT License.
