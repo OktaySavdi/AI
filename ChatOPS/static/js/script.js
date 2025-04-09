@@ -9,25 +9,47 @@ document.addEventListener('DOMContentLoaded', function() {
         return message.replace(/\*/g, '');
     }
 
+    // Function to sanitize HTML content
+    function sanitizeHTML(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // Function to add a new message to the chat
     function addMessage(message, type) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', type);
         
-        // Sanitize message before displaying
-        message = sanitizeMessage(message);
-        
-        // If message contains a table or code, format it properly
-        if (type === 'bot' && (message.includes('\n') || message.includes('  '))) {
-            const preElement = document.createElement('pre');
-            preElement.textContent = message;
-            messageElement.appendChild(preElement);
+        if (type === 'bot' || type === 'assistant') {
+            // For bot/assistant messages, preserve HTML formatting
+            if (message.startsWith('<pre>')) {
+                // Command output format
+                messageElement.innerHTML = message;
+            } else {
+                const preElement = document.createElement('pre');
+                preElement.innerHTML = sanitizeHTML(message);
+                messageElement.appendChild(preElement);
+            }
         } else {
-            messageElement.textContent = message;
+            // For user messages, sanitize and use text content
+            messageElement.textContent = sanitizeMessage(message);
         }
         
         chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        smoothScroll(chatMessages);
+    }
+
+    function smoothScroll(element) {
+        const target = element.scrollHeight;
+        element.scrollTo({
+            top: target,
+            behavior: 'smooth'
+        });
     }
     
     // Function to show loading indicator
@@ -57,17 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to send message to server
     async function sendMessage() {
         let message = userInput.value.trim();
-        
         if (message === '') return;
-        
-        // Sanitize message before sending
-        message = sanitizeMessage(message);
         
         // Add user message to chat
         addMessage(message, 'user');
         userInput.value = '';
-        
-        // Show loading indicator
         showLoading();
         
         try {
@@ -80,20 +96,17 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             const data = await response.json();
-            
-            // Remove loading indicator
             removeLoading();
             
-            if (data.error) {
-                addMessage('Sorry, an error occurred: ' + data.error, 'bot');
+            if (data.status === 'success') {
+                addMessage(data.message, 'assistant');
             } else {
-                addMessage(data.response, 'bot');
+                addMessage(data.message || 'An error occurred', 'error');
             }
         } catch (error) {
-            // Remove loading indicator
             removeLoading();
-            addMessage('Sorry, a connection error occurred.', 'bot');
             console.error('Error:', error);
+            addMessage('Sorry, a connection error occurred.', 'error');
         }
     }
 
