@@ -20,6 +20,18 @@ A chatbot application powered by a fine-tuned LLM, trained on Kubernetes knowled
  - ✅ Flask-based web UI
  - ✅ Docker-compatible deployment
 
+☸️ Kubernetes ChatOps Assistant
+
+An AI-powered **Kubernetes assistant** that connects directly to your cluster and allows you to interact using **natural language**, without needing any knowledge of `kubectl` or CLI commands.
+
+Built with a **fine-tuned large language model**, this assistant provides real-time insights about workloads, resources, errors, and general Kubernetes health, all via a simple chat interface.
+
+- ✅ Fine-tuned on real-world Kubernetes datasets  
+- ✅ Answers questions on architecture, workloads, and operations  
+- ✅ Provides real-time insights using natural language  
+- ✅ Flask-based web interface  
+- ✅ It is Docker-compatible for easy deployment  
+
 #
 🧠 Models Used
 
