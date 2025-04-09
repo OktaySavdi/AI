@@ -693,20 +693,6 @@ def get_kubeconfig_content():
         logger.error(f"Failed to read kubeconfig: {str(e)}")
         return f"Error reading kubeconfig: {str(e)}"
 
-@app.route('/api/k8s/kubeconfig', methods=['GET'])
-def get_kubeconfig():
-    try:
-        content = get_kubeconfig_content()
-        return jsonify({
-            'content': content,
-            'path': os.path.expanduser(os.getenv('KUBECONFIG_PATH'))
-        })
-    except Exception as e:
-        return jsonify({
-            'error': str(e),
-            'status': 'error'
-        }), 500
-
 # Add new route for cluster management
 @app.route('/api/k8s/status', methods=['GET'])
 def cluster_status():
