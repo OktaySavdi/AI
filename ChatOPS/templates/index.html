@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Agent Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-title">
+                <img src="{{ url_for('static', filename='images/kubernetes-logo.png') }}" alt="Kubernetes Logo" style="height: 40px;">
+                <h1>Kubernetes Assistant</h1>
+            </div>
+            <button id="clearChatButton" class="clear-button">+ New Chat</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message system">
+                Hello! You can ask questions about Kubernetes. For example, you can ask "what is the cluster status?" or "What is a Pod?".
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="userInput" placeholder="Write your message..." autocomplete="off">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
