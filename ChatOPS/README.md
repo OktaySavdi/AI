@@ -2,6 +2,8 @@
 
 This repository contains a **Kubernetes ChatOps Assistant** that leverages AI models to interpret natural language queries, generate `kubectl` commands, and execute them securely. The assistant provides explanations for the commands and troubleshooting guidance.
 
+https://github.com/user-attachments/assets/01e02dad-b980-424c-ac88-94ba79f40398
+
 ## 📌 Features
 - 🧠 **AI-Powered Command Generation**: Converts natural language queries into `kubectl` commands.
 - 🔍 **Command Execution**: Executes safe Kubernetes commands (`get`, `describe`, `logs`, `create`) and returns results.
