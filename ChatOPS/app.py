@@ -252,8 +252,8 @@ def init_gemini():
 def is_safe_k8s_command(command):
     """Validate if the command is safe to execute"""
     unsafe_patterns = [
-        'delete', 'exec', 'create', 'apply',
-        'patch', 'replace', 'edit', 'scale'
+        'delete', 'exec',  'apply',
+        'patch', 'replace', 'edit'
     ]
     command = command.lower()
     return all(pattern not in command for pattern in unsafe_patterns)
