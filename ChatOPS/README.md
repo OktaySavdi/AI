@@ -2,8 +2,6 @@
 
 This repository contains a **Kubernetes ChatOps Assistant** that leverages AI models to interpret natural language queries, generate `kubectl` commands, and execute them securely. The assistant provides explanations for the commands and troubleshooting guidance.
 
-![ChatOps](https://github.com/user-attachments/assets/23901c74-08bd-45b9-93ef-3002807d6315)
-
 ## 📌 Features
 - 🧠 **AI-Powered Command Generation**: Converts natural language queries into `kubectl` commands.
 - 🔍 **Command Execution**: Executes safe Kubernetes commands (`get`, `describe`, `logs`) and returns results.
@@ -104,6 +102,13 @@ The project supports multiple AI models for Terraform code generation and error 
 | **DeepSeek**     | ✅ Yes         | `Fine-Tuning`   | ❌ No  |
 | **Claude**       | ✅ Yes         | `Fine-Tuning`   | ❌ No  |
 | **Azure OpenAI** | ✅ Yes         | `Fine-Tuning`   | ✅ Yes |
+
+![2025-04-09 14_31_58-20 218 86 20_5000_api_k8s_status](https://github.com/user-attachments/assets/56af8050-a29a-4ac1-b35d-f767b16eaae1)
+![2025-04-09 15_39_29-Kubernetes Agent Chatbot](https://github.com/user-attachments/assets/76f379ff-371a-4a8c-9d24-0f2163944fa7)
+![2025-04-09 15_40_29-Kubernetes Agent Chatbot](https://github.com/user-attachments/assets/5031dbc3-bda5-4776-ba37-8fe23de78cd6)
+![2025-04-09 15_47_10-Kubernetes Agent Chatbot](https://github.com/user-attachments/assets/b4e07427-d10e-4837-833b-e30d0f81b8f6)
+![2025-04-09 15_50_08-Kubernetes Agent Chatbot](https://github.com/user-attachments/assets/67e0af74-ed32-45c1-840b-786822995dc8)
+![2025-04-09 15_51_02-Kubernetes Agent Chatbot](https://github.com/user-attachments/assets/b78652a5-682d-4c33-93c7-6f0e71b7e61f)
 
 🤝 Contributing
 
