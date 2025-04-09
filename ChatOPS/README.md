@@ -4,7 +4,7 @@ This repository contains a **Kubernetes ChatOps Assistant** that leverages AI mo
 
 ## 📌 Features
 - 🧠 **AI-Powered Command Generation**: Converts natural language queries into `kubectl` commands.
-- 🔍 **Command Execution**: Executes safe Kubernetes commands (`get`, `describe`, `logs`) and returns results.
+- 🔍 **Command Execution**: Executes safe Kubernetes commands (`get`, `describe`, `logs`, `create`) and returns results.
 - 🛡 **Security**: Prevents destructive commands like `delete`, `apply`, or `edit`.
 - 🔄 **Session Management**: Tracks conversation history and adapts to system prompt changes.
 - 📊 **Cluster Insights**: Provides cluster health and status information.
