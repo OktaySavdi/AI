@@ -75,6 +75,9 @@ body {
     border-radius: 15px;
     max-width: 75%;
     word-wrap: break-word;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in forwards;
+    margin: 8px 0;
 }
 
 .message.system {
@@ -91,6 +94,26 @@ body {
 .message.bot {
     background-color: #f0f0f0;
     align-self: flex-start;
+}
+
+.message.assistant pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    white-space: pre-wrap;
+}
+
+.message.assistant .command-output {
+    border-left: 4px solid #569cd6;
+}
+
+.message.error {
+    color: #f44336;
+    font-style: italic;
 }
 
 .chat-input-container {
@@ -163,10 +186,14 @@ pre {
     40% { transform: scale(1); }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .header-title {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-right: auto;
 }
-
