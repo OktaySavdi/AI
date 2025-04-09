@@ -259,21 +259,109 @@ def is_safe_k8s_command(command):
     return all(pattern not in command for pattern in unsafe_patterns)
 
 def get_cluster_status():
-    """Get current cluster connection status with detailed error message"""
+    """Get detailed cluster connection status and health information"""
     try:
+        # Verify kubeconfig path
+        kubeconfig_path = os.getenv('KUBECONFIG_PATH', os.path.expanduser('~/.kube/config'))
+        if not os.path.exists(kubeconfig_path):
+            logger.error(f"Kubeconfig not found at {kubeconfig_path}")
+            return {
+                "connected": False,
+                "message": f"Kubeconfig not found at {kubeconfig_path}",
+                "suggested_actions": [
+                    "Set KUBECONFIG_PATH environment variable",
+                    "Ensure kubeconfig file exists",
+                    "Run 'kubectl config view' to verify configuration"
+                ]
+            }
+
+        # Test API server connectivity
+        api_server = subprocess.run(
+            ["kubectl", "config", "view", "--minify", "-o", "jsonpath={.clusters[0].cluster.server}"],
+            capture_output=True,
+            text=True,
+            timeout=5
+        ).stdout.strip()
+        if not api_server:
+            logger.error("Failed to retrieve API server URL from kubeconfig")
+            return {
+                "connected": False,
+                "message": "Failed to retrieve API server URL from kubeconfig",
+                "suggested_actions": [
+                    "Check kubeconfig file for cluster details",
+                    "Ensure the cluster is configured correctly"
+                ]
+            }
+
+        # Test network connectivity to API server
+        api_host = api_server.replace("https://", "").split(":")[0]
+        ping_result = subprocess.run(
+            ["ping", "-c", "1", "-W", "3", api_host],
+            capture_output=True,
+            timeout=5
+        )
+        if ping_result.returncode != 0:
+            logger.error(f"Cannot reach API server at {api_host}")
+            return {
+                "connected": False,
+                "message": f"Cannot reach API server at {api_host}",
+                "suggested_actions": [
+                    "Check network connectivity",
+                    "Verify VPN connection if required",
+                    "Ensure API server is running"
+                ]
+            }
+
+        # Initialize Kubernetes client
+        config.load_kube_config()
         v1 = CoreV1Api()
-        v1.list_namespace()
-        return {"connected": True, "message": "Successfully connected to cluster"}
+
+        # Test basic connectivity
+        namespaces = v1.list_namespace(timeout_seconds=5)
+
+        # Get node status
+        nodes = v1.list_node(timeout_seconds=5)
+        node_status = []
+        for node in nodes.items:
+            conditions = {cond.type: cond.status for cond in node.status.conditions}
+            node_status.append({
+                'name': node.metadata.name,
+                'ready': conditions.get('Ready', 'Unknown'),
+                'conditions': conditions
+            })
+
+        return {
+            "connected": True,
+            "message": "Successfully connected to cluster",
+            "node_status": node_status,
+            "active_context": subprocess.getoutput("kubectl config current-context"),
+            "connection_details": {
+                "api_server": api_server,
+                "kubeconfig": kubeconfig_path
+            }
+        }
+
     except ApiException as e:
+        logger.error(f"Kubernetes API error: {e.reason}")
         return {
             "connected": False,
             "message": f"Kubernetes API error: {e.reason}",
-            "status_code": e.status
+            "suggested_actions": [
+                "Verify kubeconfig file",
+                "Check cluster credentials",
+                "Ensure cluster is running"
+            ]
         }
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}", exc_info=True)
         return {
             "connected": False,
-            "message": f"Failed to connect to cluster: {str(e)}"
+            "message": f"Unexpected error: {str(e)}",
+            "suggested_actions": [
+                "Check application logs for details",
+                "Verify network connectivity",
+                "Ensure cluster is accessible"
+            ]
         }
 
 def execute_k8s_command(command):
@@ -301,6 +389,11 @@ Please verify:
             text=True,
             check=True
         )
+        
+        # Handle empty output
+        if not result.stdout.strip():
+            return "✅ Command executed successfully, but returned no results. This might mean no resources were found."
+            
         return f"""✅ Command executed successfully:
 {result.stdout}"""
     except subprocess.CalledProcessError as e:
@@ -322,7 +415,7 @@ def process_k8s_query(query, messages):
         if not status["connected"]:
             return "kubectl cluster-info", "Checking cluster connectivity"
 
-        provider = os.getenv('MODEL_PROVIDER', 'openai').lower()  # Default to OpenAI if not set
+        provider = os.getenv('MODEL_PROVIDER').lower()  # Default to OpenAI if not set
         
         # Add K8s context for command generation
         k8s_messages = messages.copy()
@@ -351,19 +444,52 @@ def process_k8s_query(query, messages):
                 api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             )
             logger.debug("Azure OpenAI client initialized")
-            response = client.chat.completions.create(
-                model=os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME'),
-                messages=messages,
-                max_tokens=300, 
-                temperature=0.1,  
-                top_p=0.95,  
-                frequency_penalty=0,  
-                presence_penalty=0,
-                stop=None,  
-                stream=False,
-                seed=42
-            )
-            ai_response = response.choices[0].message.content
+            
+            # Format messages properly for Azure OpenAI
+            formatted_messages = [
+                {
+                    "role": "system",
+                    "content": "You are a Kubernetes assistant. Always respond in JSON format with 'command' and 'explanation' fields."
+                },
+                {
+                    "role": "user",
+                    "content": query
+                }
+            ]
+            
+            try:
+                response = client.chat.completions.create(
+                    model=os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME'),
+                    messages=formatted_messages,
+                    max_tokens=300,
+                    temperature=0.1,
+                    top_p=0.95,
+                    frequency_penalty=0,
+                    presence_penalty=0,
+                    stop=None,
+                    stream=False,
+                    seed=42,
+                    response_format={ "type": "json_object" }  # Force JSON response
+                )
+                
+                ai_response = response.choices[0].message.content
+                logger.debug(f"Raw Azure OpenAI response: {ai_response}")
+                
+                # Validate JSON format
+                try:
+                    parsed_response = json.loads(ai_response)
+                    if not all(k in parsed_response for k in ['command', 'explanation']):
+                        logger.error("Response missing required fields")
+                        return "kubectl get pods", "Showing pods (fallback command)"
+                    return parsed_response['command'], parsed_response['explanation']
+                except json.JSONDecodeError as je:
+                    logger.error(f"JSON parsing error: {str(je)}, Response: {ai_response}")
+                    return "kubectl get pods", "Showing pods (fallback command)"
+                    
+            except Exception as e:
+                logger.error(f"Azure OpenAI API error: {str(e)}")
+                return None, None
+
         elif provider == 'gemini':
             logger.debug("Using Gemini provider")
             try:
@@ -438,24 +564,62 @@ def home():
 def chat():
     try:
         user_message = request.json.get('message')
+        if not user_message:
+            return jsonify({'message': "⚠️ Empty message received", 'status': 'error'})
+            
         session_id = session.get('session_id', os.urandom(16).hex())
         messages = get_conversation_history(session_id)
 
+        # Get K8s command
         k8s_command, explanation = process_k8s_query(user_message, messages)
-        if not k8s_command:
-            return jsonify({'message': "⚠️ Could not understand your request.", 'status': 'error'})
+        logger.debug(f"K8s command generated: {k8s_command}, Explanation: {explanation}")
+        
+        if not k8s_command or not explanation:
+            return jsonify({
+                'message': "⚠️ Could not generate a valid Kubernetes command. Please try rephrasing your question.",
+                'status': 'error'
+            })
 
-        result = execute_k8s_command(k8s_command)
+        # Execute command and capture output
+        try:
+            result = execute_k8s_command(k8s_command)
+            logger.debug(f"Command execution result: {result}")
+            
+            # Format the response with proper HTML escaping
+            assistant_message = f"""{result}""".strip()
 
-        save_message(session_id, "user", user_message)
-        assistant_message = f"""<pre>\nUnderstanding: {explanation}\nCommand: {k8s_command}\nResult:\n{result}\n</pre>"""
-        save_message(session_id, "assistant", assistant_message)
-        return jsonify({'message': assistant_message, 'status': 'success'})
+            # Save conversation
+            save_message(session_id, "user", user_message)
+            save_message(session_id, "assistant", assistant_message)
+            
+            # Return structured response
+            return jsonify({
+                'message': assistant_message,
+                'status': 'success',
+                'data': {
+                    'command': k8s_command,
+                    'explanation': explanation,
+                    'result': result
+                }
+            })
+            
+        except Exception as e:
+            logger.error(f"Command execution error: {str(e)}")
+            return jsonify({
+                'message': f"❌ Error executing command: {str(e)}",
+                'status': 'error'
+            })
+            
     except Exception as e:
-        return jsonify({'error': str(e), 'status': 'error'}), 500
+        logger.error(f"Chat endpoint error: {str(e)}", exc_info=True)
+        return jsonify({
+            'message': "❌ An unexpected error occurred",
+            'status': 'error',
+            'error': str(e)
+        }), 500
 
 # Clear Chat API: Removes conversation history for current session
-@app.route('/api/clear_chat', methods=['POST'])
+@app.route('/api/lear_chat', methods=['POST'])
 def clear_chat():
     try:
         session_id = session.get('session_id', os.urandom(16).hex())
@@ -549,16 +713,38 @@ def cluster_status():
     try:
         contexts = get_available_contexts()
         status = get_cluster_status()
+        
+        # Add connection test
+        if status['connected']:
+            try:
+                # Test specific cluster connectivity
+                test_cmd = subprocess.run(
+                    ['kubectl', 'cluster-info'], 
+                    capture_output=True, 
+                    text=True,
+                    timeout=5
+                )
+            except subprocess.TimeoutExpired:
+                status['connected'] = False
+                status['message'] = "Cluster connection timeout"
+                status['suggested_actions'] = ["Check if cluster is responsive", "Verify network connectivity"]
+        
         return jsonify({
             **status,
             'contexts': contexts['contexts'],
             'active_context': contexts['active']
         })
     except Exception as e:
+        logger.error(f"Status check error: {str(e)}")
         return jsonify({
             'connected': False,
             'message': str(e),
-            'status': 'error'
+            'status': 'error',
+            'suggested_actions': [
+                "Check if kubectl is installed and in PATH",
+                "Verify kubeconfig file exists and is valid",
+                "Ensure you have proper permissions"
+            ]
         }), 500
 
 @app.route('/api/k8s/switch-context', methods=['POST'])
@@ -590,4 +776,4 @@ if __name__ == '__main__':
         if not init_gemini():
             logger.error("Failed to initialize Gemini")
     
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
