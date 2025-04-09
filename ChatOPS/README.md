@@ -73,8 +73,6 @@ LOG_LEVEL=DEBUG
 KUBECONFIG_PATH=kubeconfig/config
 ```
 
-The application will start on `http://0.0.0.0:5000`.
-
 ## 🔍 How It Works
 1. **Natural Language Query**: Users input queries like "Show me all pods in the default namespace."
 2. **AI Processing**: The assistant converts the query into a `kubectl` command.
