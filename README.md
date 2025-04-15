@@ -38,7 +38,6 @@ Built with a **fine-tuned large language model**, this assistant provides real-t
 This repo makes use of several LLMs for experimentation and deployment:
 
  - OpenAI (GPT-4) 
- - Google 
  - Gemini 
  - DeepSeek 
  - Claude 
