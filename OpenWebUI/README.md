@@ -6,6 +6,7 @@ Open WebUI is a self-hosted, feature-rich web interface for Ollama that provides
 
 ## Prerequisites
 
+- Github address - https://github.com/open-webui/open-webui
 - Azure VM with Ollama already running
 - Docker installed on the VM
 - Ollama running on port 11434
