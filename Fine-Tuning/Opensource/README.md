@@ -13,7 +13,7 @@ Complete setup to fine-tune an open-source LLM using 1,980 Kubernetes training e
 
 ### Option 1: Quick Setup (2 min) - No Training
 ```bash
-cd /home/os/ollama-finetuning
+cd AI/Fine-Tuning/Opensource
 docker cp Modelfile ollama:/tmp/Modelfile
 docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile
 docker exec -it ollama ollama run k8s-assistant
@@ -21,7 +21,7 @@ docker exec -it ollama ollama run k8s-assistant
 
 ### Option 2: Full Fine-tuning (~10 minutes) - RECOMMENDED
 ```bash
-cd /home/os/ollama-finetuning
+cd AI/Fine-Tuning/Opensource
 
 # Install system dependencies for llama.cpp
 sudo apt-get update && sudo apt-get install -y cmake libcurl4-openssl-dev
@@ -35,7 +35,7 @@ if [ ! -d "/home/os/llama.cpp" ]; then
   git clone https://github.com/ggerganov/llama.cpp.git
   cd llama.cpp
   cmake -B build && cmake --build build --config Release -j$(nproc)
-  cd /home/os/ollama-finetuning
+  cd AI/Fine-Tuning/Opensource
 fi
 
 # Train model (takes ~5 minutes on H100)
