@@ -28,14 +28,14 @@ def load_and_prepare_data(file_path):
             user_msg = next(m['content'] for m in messages if m['role'] == 'user')
             assistant_msg = next(m['content'] for m in messages if m['role'] == 'assistant')
             
-            # Create formatted prompt
+            # Create formatted prompt with EOS token to teach model when to stop
             formatted_text = f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 ### Instruction:
 {user_msg}
 
 ### Response:
-{assistant_msg}"""
+{assistant_msg}</s>"""
             
             data.append({"text": formatted_text})
     
