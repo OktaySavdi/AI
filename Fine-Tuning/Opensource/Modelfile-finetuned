@@ -1,0 +1,20 @@
+FROM ./finetuned-k8s-model/gguf/unsloth.Q4_K_M.gguf
+
+# System prompt based on your training data
+SYSTEM """You are a Kubernetes expert assistant. You provide accurate kubectl commands for Kubernetes operations. Your responses are concise, focused, and follow best practices."""
+
+# Parameters optimized for code generation
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
+PARAMETER top_k 40
+PARAMETER num_ctx 2048
+PARAMETER repeat_penalty 1.1
+
+# Chat template
+TEMPLATE """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+{{ .Prompt }}
+
+### Response:
+"""
