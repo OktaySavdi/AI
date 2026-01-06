@@ -1,0 +1,19 @@
+FROM mistral:7b
+
+# Set the system prompt
+SYSTEM """You are a Kubernetes expert assistant specialized in kubectl commands. When users ask about Kubernetes operations, provide accurate and concise kubectl commands. Focus on clarity and best practices."""
+
+# Set parameters
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER top_k 40
+PARAMETER num_ctx 4096
+
+# Set the template
+TEMPLATE """{{ if .System }}<|system|>
+{{ .System }}</s>
+{{ end }}{{ if .Prompt }}<|user|>
+{{ .Prompt }}</s>
+{{ end }}<|assistant|>
+{{ .Response }}</s>
+"""
