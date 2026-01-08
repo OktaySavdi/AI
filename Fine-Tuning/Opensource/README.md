@@ -332,8 +332,26 @@ curl http://localhost:11434/api/generate -d '{
 - `convert_to_gguf.py` - Manual GGUF conversion script using llama.cpp
 - `test_model.py` - Test script for the trained model
 - `requirements.txt` - Python dependencies
-- `Modelfile` - Ollama config for quick setup (Option 1)
-- `Modelfile-finetuned` - Ollama config for fine-tuned model (Option 2)
+
+### Modelfile Configurations (Choose based on your use case)
+
+- **`Modelfile`** - Quick setup (no training needed)
+  - Uses pre-trained base model
+  - Fast deployment (2 minutes)
+  - Good for testing Ollama setup
+
+- **`Modelfile-finetuned`** - Standard fine-tuned model ⭐ RECOMMENDED
+  - Uses your trained K8s model
+  - Optimized for CLI/API usage
+  - Context: 8,192 tokens
+  - Best for: Scripts, automation, terminal use
+
+- **`Modelfile-continue`** - IDE/Continue extension optimized
+  - Uses your trained K8s model
+  - Optimized for Continue/Copilot extensions
+  - Context: 16,384 tokens (large for file context)
+  - Strict generation limits (prevents infinite output)
+  - Best for: VS Code, IDEs, chat interfaces
 
 ## Output Files
 
@@ -659,6 +677,49 @@ ask_k8s() {
 CMD=$(ask_k8s "Get logs from pod nginx-app")
 echo "Generated command: $CMD"
 eval "$CMD"  # Execute the command
+```
+
+**Continue Extension (VS Code/IDEs)**:
+
+If you're using Continue or similar AI coding assistants in VS Code:
+
+1. **Deploy with Continue-optimized Modelfile**:
+```bash
+cd /home/os/ollama-finetuning
+docker cp Modelfile-continue ollama:/tmp/Modelfile-continue
+docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile-continue
+```
+
+2. **Configure Continue extension** (`~/.continue/config.json`):
+```json
+{
+  "models": [
+    {
+      "title": "K8s Assistant",
+      "provider": "ollama",
+      "model": "k8s-assistant",
+      "apiBase": "http://localhost:11434"
+    }
+  ]
+}
+```
+
+3. **Why use `Modelfile-continue`?**
+   - ✅ 16,384 token context (fits large code files + chat history)
+   - ✅ `num_predict` limit prevents infinite generation
+   - ✅ Optimized stop sequences prevent template bleeding
+   - ✅ Lower temperature (0.1) for more deterministic code
+   - ✅ No "Message exceeds context limit" errors
+
+**Switch between Modelfiles**:
+```bash
+# For CLI/scripting (8K context, standard)
+docker cp Modelfile-finetuned ollama:/tmp/Modelfile
+docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile
+
+# For Continue/IDE (16K context, generation limits)
+docker cp Modelfile-continue ollama:/tmp/Modelfile-continue
+docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile-continue
 ```
 
 **CI/CD Pipeline Integration**:
