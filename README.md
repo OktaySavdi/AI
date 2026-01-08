@@ -42,3 +42,4 @@ This repo makes use of several LLMs for experimentation and deployment:
  - DeepSeek 
  - Claude 
  - Azure OpenAI
+ - Ollama
