@@ -94,8 +94,9 @@ docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile
 ├── convert_to_gguf.py        # GGUF conversion
 ├── test_model.py             # Testing script
 ├── requirements.txt          # Python dependencies
-├── Modelfile                 # Quick setup config
-├── Modelfile-finetuned       # Fine-tuned config
+├── Modelfile                 # Quick setup config (no training)
+├── Modelfile-finetuned       # Fine-tuned config (CLI/API) ✓ Recommended
+├── Modelfile-continue        # IDE/Continue extension optimized
 └── finetuned-k8s-model/      # Model output
     ├── checkpoint-100/
     ├── checkpoint-200/
@@ -104,6 +105,14 @@ docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile
         ├── k8s-model-f16.gguf    # Full precision (14.5GB)
         └── k8s-model-q4km.gguf   # Quantized (4.4GB) ✓ In use
 ```
+
+### Which Modelfile to Use?
+
+| Use Case | Modelfile | Context | Notes |
+|----------|-----------|---------|-------|
+| **Terminal/Scripts** | `Modelfile-finetuned` | 8K tokens | Best for CLI |
+| **VS Code/Continue** | `Modelfile-continue` | 16K tokens | Prevents context errors |
+| **Quick Testing** | `Modelfile` | 2K tokens | No training needed |
 
 ## 6. Troubleshooting
 
@@ -166,6 +175,33 @@ ask_k8s() {
 # Example
 ask_k8s "Scale deployment web-app to 5 replicas"
 ```
+
+### VS Code / Continue Extension
+
+**If you get "Message exceeds context limit" error:**
+
+1. Use the Continue-optimized Modelfile:
+```bash
+cd /home/os/ollama-finetuning
+docker cp Modelfile-continue ollama:/tmp/Modelfile-continue
+docker exec ollama ollama create k8s-assistant -f /tmp/Modelfile-continue
+```
+
+2. Configure Continue (`~/.continue/config.json`):
+```json
+{
+  "models": [
+    {
+      "title": "K8s Assistant",
+      "provider": "ollama",
+      "model": "k8s-assistant",
+      "apiBase": "http://localhost:11434"
+    }
+  ]
+}
+```
+
+3. Restart VS Code and test with: "List all pods in default namespace"
 
 ## 9. Model Info
 
