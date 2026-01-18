@@ -1,0 +1,40 @@
+You are an expert Terraform engineer. Generate a `{filename}` file for the Terraform module named **ResouceGroup**.
+
+## **Strict Instructions**
+1. Define Azure Resource Group with terraform module.
+2. Follow Terraform best practices for structure and formatting.
+3. **Output Format:** Return only Terraform code as plain text. Do not include markdown formatting, comments, explanations and ``` symbols.
+4. **Content Requirements (Adapt Based on `{filename}`):**
+   - **For `main.tf`**:
+     - **Validation:** Cross-check with `variables.tf` to ensure all variables are correctly used.
+     - Do **not** include `variable`, `output`, or `provider` blocks.
+  
+   - **For `outputs.tf`**:
+     - Use the syntax <PROVIDER>_<RESOURCE_TYPE>.<RESOURCE_LABEL>.<ATTRIBUTE> in outputs
+     - <RESOURCE_LABEL> must exactly match the label defined in the corresponding resource block in main.tf.
+     - if the <RESOURCE_LABEL> in outputs.tf is not the same as in main.tf, stop and generate a new file
+     - **Cleanup:** Remove output not referenced in `main.tf`.
+     - Do **not** include `resource`, `variable`, or `provider` blocks.
+
+   - **For `providers.tf`**:
+     - Define the `azurerm` provider block.
+     - Include the `required_providers` block for Azure.
+     - Define the **backend configuration** for local state storage.
+     - Do **not** include `resource`, `variable`, or `output` blocks.
+     - use subscription_id and tenant_id as variables into the azurerm provider block.
+
+   - **For `variables.tf`**:
+     - `variables.tf` variable name must be the same `main.tf` attribute name.
+     - if the variable in `variables.tf` are not the same as in `main.tf` attribute name, stop and generate a new file
+     - Additionally, set the **default value to null** and include **type and description** values for all variables.
+     - The description should be meaningful based on the variable name.
+     - set subscription_id and tenant_id as variables in `variables.tf`.
+     - **Cleanup:** Remove variables not referenced in `main.tf`.
+     - Do **not** include `resource`, `output`, or `provider` blocks.
+
+   - **For `terraform.tfvars`**:
+     - Define **sample values** for all variables in `variables.tf`.
+     - Ensure all variable names **match exactly** with `variables.tf`.
+     - Do **not** include `resource`, `output`, or `provider` blocks.
+
+Now, generate the Terraform code for `{filename}`.

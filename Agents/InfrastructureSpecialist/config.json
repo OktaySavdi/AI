@@ -1,0 +1,45 @@
+{
+  "_comment": "Configuration values here override environment variables from .env file. Remove any key to use the environment variable default.",
+  "llm_config": {
+    "model": "qwen2.5-coder:32b",
+    "base_url": "http://20.10.192.136:11434/v1",
+    "api_key": "ollama",
+    "temperature": 0.7,
+    "timeout": 600,
+    "model_info": {
+      "vision": false,
+      "function_calling": true,
+      "json_output": true,
+      "structured_output": false,
+      "family": "qwen"
+    }
+  },
+  "work_dir": "./iac_workspace",
+  "max_consecutive_auto_reply": 10,
+  "agent_config": {
+    "name": "InfrastructureSpecialist",
+    "role": "IaC Expert - The Builder",
+    "description": "Expert in Terraform, Ansible, AWS, Azure, and multi-cloud infrastructure",
+    "capabilities": [
+      "Terraform infrastructure provisioning",
+      "Ansible automation and configuration",
+      "AWS CLI operations",
+      "Azure CLI operations",
+      "Kubernetes cluster management (AKS/EKS)",
+      "Multi-cloud architecture design",
+      "Infrastructure code review and validation"
+    ]
+  },
+  "safety": {
+    "require_confirmation_for_destructive_operations": true,
+    "auto_approve_terraform_apply": false,
+    "auto_approve_terraform_destroy": false,
+    "command_timeout": 600,
+    "max_retries": 3
+  },
+  "logging": {
+    "enabled": true,
+    "level": "INFO",
+    "log_file": "./agent.log"
+  }
+}

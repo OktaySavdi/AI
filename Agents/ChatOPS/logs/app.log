@@ -1,0 +1,108 @@
+2025-04-09 13:44:47,302 - INFO - Starting application
+2025-04-09 13:44:47,364 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:44:47,364 - INFO - Database initialized
+2025-04-09 13:44:47,408 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:44:48,299 - INFO - Starting application
+2025-04-09 13:44:48,344 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:44:48,344 - INFO - Database initialized
+2025-04-09 13:44:48,386 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:45:00,491 - DEBUG - Using Azure OpenAI provider
+2025-04-09 13:45:00,531 - DEBUG - Azure OpenAI client initialized
+2025-04-09 13:45:01,382 - DEBUG - Raw Azure OpenAI response: { "command": "kubectl get pods -n default", "explanation": "List all pods in the default namespace." }
+2025-04-09 13:45:01,382 - DEBUG - K8s command generated: kubectl get pods -n default, Explanation: List all pods in the default namespace.
+2025-04-09 13:45:01,608 - DEBUG - Command execution result: ✅ Command executed successfully:
+NAME                  READY   STATUS    RESTARTS   AGE
+web-74d457c5c-7p7rq   1/1     Running   0          85s
+
+2025-04-09 13:45:08,700 - DEBUG - Using Azure OpenAI provider
+2025-04-09 13:45:08,723 - DEBUG - Azure OpenAI client initialized
+2025-04-09 13:45:10,197 - DEBUG - Raw Azure OpenAI response: { "command": "kubectl describe pod web-74d457c5c-7p7rq -n default", "explanation": "This command provides detailed information about the pod 'web-74d457c5c-7p7rq' in the 'default' namespace, including events and error messages." }
+2025-04-09 13:45:10,197 - DEBUG - K8s command generated: kubectl describe pod web-74d457c5c-7p7rq -n default, Explanation: This command provides detailed information about the pod 'web-74d457c5c-7p7rq' in the 'default' namespace, including events and error messages.
+2025-04-09 13:45:10,443 - DEBUG - Command execution result: ✅ Command executed successfully:
+Name:             web-74d457c5c-7p7rq
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             aks-test-29003102-vmss000000/10.0.0.7
+Start Time:       Wed, 09 Apr 2025 13:43:36 +0000
+Labels:           app=web
+                  pod-template-hash=74d457c5c
+Annotations:      <none>
+Status:           Running
+IP:               10.244.2.229
+IPs:
+  IP:           10.244.2.229
+Controlled By:  ReplicaSet/web-74d457c5c
+Containers:
+  istioproject:
+    Container ID:   containerd://14fed50706b0d59ddb35079101f87e1d788b9fc397261ccb415f747f6d32fc5c
+    Image:          quay.io/oktaysavdi/istioproject:v4
+    Image ID:       quay.io/oktaysavdi/istioproject@sha256:eb73368681c3c65b68656293a5a12da3bddcedacce36af25e2287cc4fa09dd7e
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Wed, 09 Apr 2025 13:43:55 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bkkxr (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-bkkxr:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  93s   default-scheduler  Successfully assigned default/web-74d457c5c-7p7rq to aks-test-29003102-vmss000000
+  Normal  Pulling    93s   kubelet            Pulling image "quay.io/oktaysavdi/istioproject:v4"
+  Normal  Pulled     75s   kubelet            Successfully pulled image "quay.io/oktaysavdi/istioproject:v4" in 18.014s (18.014s including waiting). Image size: 160140015 bytes.
+  Normal  Created    75s   kubelet            Created container: istioproject
+  Normal  Started    75s   kubelet            Started container istioproject
+
+2025-04-09 13:45:43,052 - DEBUG - Using Azure OpenAI provider
+2025-04-09 13:45:43,075 - DEBUG - Azure OpenAI client initialized
+2025-04-09 13:45:43,889 - DEBUG - Raw Azure OpenAI response: { "command": "kubectl get pods -n default", "explanation": "List all pods in the default namespace." }
+2025-04-09 13:45:43,889 - DEBUG - K8s command generated: kubectl get pods -n default, Explanation: List all pods in the default namespace.
+2025-04-09 13:45:44,093 - DEBUG - Command execution result: ✅ Command executed successfully:
+NAME                  READY   STATUS    RESTARTS   AGE
+web-74d457c5c-7p7rq   1/1     Running   0          2m8s
+
+2025-04-09 13:46:46,953 - INFO - Starting application
+2025-04-09 13:46:46,997 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:46:46,997 - INFO - Database initialized
+2025-04-09 13:46:47,033 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:46:47,936 - INFO - Starting application
+2025-04-09 13:46:47,981 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:46:47,982 - INFO - Database initialized
+2025-04-09 13:46:48,019 - INFO - Successfully connected to Kubernetes cluster
+2025-04-09 13:46:55,460 - DEBUG - Using Azure OpenAI provider
+2025-04-09 13:46:55,499 - DEBUG - Azure OpenAI client initialized
+2025-04-09 13:46:56,305 - DEBUG - Raw Azure OpenAI response: { "command": "kubectl get pods -n default", "explanation": "List all pods in the default namespace." }
+2025-04-09 13:46:56,305 - DEBUG - K8s command generated: kubectl get pods -n default, Explanation: List all pods in the default namespace.
+2025-04-09 13:46:56,546 - DEBUG - Command execution result: ✅ Command executed successfully:
+NAME                  READY   STATUS    RESTARTS   AGE
+web-74d457c5c-7p7rq   1/1     Running   0          3m20s
+
+2025-04-09 13:47:04,359 - DEBUG - Using Azure OpenAI provider
+2025-04-09 13:47:04,382 - DEBUG - Azure OpenAI client initialized
+2025-04-09 13:47:05,191 - DEBUG - Raw Azure OpenAI response: { "command": "kubectl get nodes", "explanation": "List all nodes and their status in the cluster." }
+2025-04-09 13:47:05,192 - DEBUG - K8s command generated: kubectl get nodes, Explanation: List all nodes and their status in the cluster.
+2025-04-09 13:47:05,444 - DEBUG - Command execution result: ✅ Command executed successfully:
+NAME                           STATUS   ROLES    AGE     VERSION
+aks-test-29003102-vmss000000   Ready    <none>   3h27m   v1.30.11
+
