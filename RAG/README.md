@@ -62,7 +62,7 @@ All into a **single `.mv2` file** - no external database needed!
 ### Installation
 
 ```bash
-cd /Users/osavdi@greentube.com/Documents/Scripts/AI/RAG
+cd /Users/Documents/Scripts/AI/RAG
 
 # Create virtual environment
 uv venv
