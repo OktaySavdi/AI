@@ -125,6 +125,8 @@ RAG/
 | `MemvidMemory` | Wrapper for Memvid operations (create, add, search) |
 | `InfrastructureRAG` | Main RAG orchestrator combining search + LLM |
 
+**Key Update**: The SDK uses `mem.put(text=content, title=..., uri=..., tags=...)` with keyword arguments, and `mem.find(query, k=top_k)` returns a dict with a `hits` key containing results.
+
 **Usage as Library**:
 ```python
 from rag_example import InfrastructureRAG, RAGConfig
@@ -221,10 +223,9 @@ chunks = chunker.chunk_documents(docs)
 
 # Ingest into Memvid
 ingester = MemvidIngester("./memories/my-memory.mv2")
-ingester.ingest(chunks)
-ingester.commit()
+count = ingester.ingest(chunks)
 
-print(f"Ingested {len(chunks)} chunks")
+print(f"Ingested {count} chunks")
 ```
 
 ---
@@ -483,6 +484,15 @@ class InfrastructureSpecialist:
 ---
 
 ## 🛠️ Troubleshooting
+
+### Memvid SDK Issues
+```bash
+# Install Python SDK (required)
+pip install memvid-sdk
+
+# Verify installation
+python3 -c "import memvid_sdk; print('SDK installed')"
+```
 
 ### Memvid CLI not found
 ```bash

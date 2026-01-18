@@ -207,19 +207,18 @@ class MemvidMemory:
             try:
                 import memvid_sdk
                 mem = memvid_sdk.open(str(self.memory_file))
-                response = mem.search(
+                response = mem.find(
                     query=query,
-                    top_k=top_k,
-                    snippet_chars=snippet_chars
+                    k=top_k
                 )
                 return [
                     {
-                        "text": hit.text,
-                        "title": hit.title,
-                        "score": hit.score,
-                        "uri": hit.uri
+                        "text": hit.get("text", ""),
+                        "title": hit.get("title", ""),
+                        "score": hit.get("score", 0.0),
+                        "uri": hit.get("uri", "")
                     }
-                    for hit in response.hits
+                    for hit in response.get("hits", [])
                 ]
             except Exception as e:
                 print(f"❌ Search failed: {e}")

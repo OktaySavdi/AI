@@ -287,13 +287,22 @@ class MemvidIngester:
         """Ingest using Memvid SDK"""
         try:
             import memvid_sdk
-            mem = memvid_sdk.open(str(self.memory_file))
+            
+            # If file exists, delete it for fresh creation
+            if self.memory_file.exists():
+                self.memory_file.unlink()
+            
+            # Ensure parent directory exists
+            self.memory_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Create new memory with correct API
+            mem = memvid_sdk.create(str(self.memory_file), kind='basic', enable_lex=True)
             
             success_count = 0
             for doc in tqdm(documents, desc="Ingesting"):
                 try:
                     mem.put(
-                        doc.content.encode(),
+                        text=doc.content,
                         title=doc.title,
                         uri=doc.uri,
                         tags=doc.tags
@@ -302,7 +311,6 @@ class MemvidIngester:
                 except Exception as e:
                     print(f"⚠️  Failed to add: {doc.title} - {e}")
             
-            mem.commit()
             return success_count
         except Exception as e:
             print(f"❌ SDK ingestion failed: {e}")
