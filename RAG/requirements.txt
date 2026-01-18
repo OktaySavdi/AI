@@ -1,0 +1,24 @@
+# RAG with Memvid + Ollama
+# Install: pip install -r requirements.txt
+
+# Memvid SDK for memory management
+memvid-sdk>=0.1.0
+
+# HTTP requests for Ollama API
+requests>=2.31.0
+
+# Environment configuration
+python-dotenv>=1.0.0
+
+# Document processing
+pypdf>=4.0.0
+python-docx>=1.0.0
+
+# Text processing
+tiktoken>=0.5.0
+
+# Progress bars
+tqdm>=4.66.0
+
+# Optional: For advanced chunking
+# langchain-text-splitters>=0.0.1

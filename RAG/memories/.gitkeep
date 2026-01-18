@@ -1,0 +1,5 @@
+# This directory contains Memvid memory files (.mv2)
+# These files store indexed documents for RAG retrieval
+
+# To create a memory file, run:
+# python ingest_documents.py --input ../knowledge --output ./infrastructure.mv2
