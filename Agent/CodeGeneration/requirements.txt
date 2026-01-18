@@ -1,6 +1,0 @@
-google-generativeai
-requests
-anthropic
-gitpython
-python-dotenv
-openai==1.55.3
