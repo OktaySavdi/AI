@@ -116,6 +116,21 @@ Open WebUI deployment and configuration - a user-friendly web interface for inte
 
 ---
 
+### 🔍 RAG/
+
+Retrieval-Augmented Generation (RAG) implementation using Memvid for knowledge storage and self-hosted Ollama models for intelligent document retrieval and question answering.
+
+- ✅ Single-file memory system (no external database)
+- ✅ Semantic + lexical search
+- ✅ Document ingestion pipeline
+- ✅ Interactive query interface
+- ✅ Kubernetes and Terraform knowledge base
+- ✅ Offline-capable with local LLMs
+
+📂 [`RAG/`](RAG/)
+
+---
+
 ## 🧠 Models Used
 
 This repository makes use of several LLMs for experimentation and deployment:
