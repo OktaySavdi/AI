@@ -1,0 +1,88 @@
+{
+  "hooks": [
+    {
+      "description": "Secret pattern detector — block bash commands containing credential patterns",
+      "event": "PreToolUse",
+      "matcher": "tool_name == 'Bash'",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.claude/hooks/scripts/secret-detector.sh"
+        }
+      ]
+    },
+    {
+      "description": "K8s dry-run reminder — remind after editing YAML manifests",
+      "event": "PostToolUse",
+      "matcher": "tool_name in ['Write', 'Edit', 'MultiEdit'] && (tool_input.file_path matches '.*\\.ya?ml$')",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.claude/hooks/scripts/k8s-dryrun-reminder.sh"
+        }
+      ]
+    },
+    {
+      "description": "Terraform format reminder — remind after editing .tf files",
+      "event": "PostToolUse",
+      "matcher": "tool_name in ['Write', 'Edit', 'MultiEdit'] && (tool_input.file_path matches '.*\\.tf$')",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.claude/hooks/scripts/terraform-fmt-reminder.sh"
+        }
+      ]
+    },
+    {
+      "description": "Latest tag blocker — prevent :latest image tags in K8s manifests",
+      "event": "PostToolUse",
+      "matcher": "tool_name in ['Write', 'Edit', 'MultiEdit'] && (tool_input.file_path matches '.*\\.ya?ml$')",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.claude/hooks/scripts/latest-tag-check.sh"
+        }
+      ]
+    },
+    {
+      "description": "Strategic compact suggestion — advise /compact when context is >= threshold",
+      "event": "PostToolUse",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node ~/.claude/scripts/hooks/suggest-compact.js"
+        }
+      ]
+    },
+    {
+      "description": "Session start context loader — display active context and reminders",
+      "event": "SessionStart",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.claude/hooks/scripts/session-start.sh"
+        }
+      ]
+    },
+    {
+      "description": "Session end state saver — persist session record to history",
+      "event": "Stop",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node ~/.claude/scripts/hooks/session-end.js"
+        }
+      ]
+    },
+    {
+      "description": "Pre-compact state snapshot — save state before context compaction",
+      "event": "PreCompact",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node ~/.claude/scripts/hooks/pre-compact.js"
+        }
+      ]
+    }
+  ]
+}
