@@ -182,6 +182,76 @@ Should contain:
 
 ---
 
+## Concepts Explained Simply
+
+If you're new to the ECC harness, here's what each piece does in plain language:
+
+### Skills — The Cheat Sheet
+Claude reads a skill file **before** doing a specific type of task, giving it accurate,
+tested patterns for that domain.
+
+> **Example:** You ask "write a Bash script" → Claude reads `shell-scripting/SKILL.md`
+> first, which says *"always use `set -euo pipefail`, trap errors, use functions..."*.
+> Without the skill Claude writes a basic script. With it, Claude writes a production one.
+>
+> Like giving a chef a recipe book before they cook.
+
+### Agents — The Specialists
+A specialist Claude can hand work off to. Each agent is a **fresh Claude instance**
+with focused scope — no distractions from your current conversation history.
+
+> **Example:** You ask for a Kubernetes YAML review → Claude delegates to `k8s-reviewer`
+> which only focuses on that, returning a structured BLOCKER / MAJOR / MINOR report.
+>
+> Like a manager sending work to a specialist on their team.
+
+### Commands — The Shortcuts
+Slash commands trigger a predefined multi-step workflow so you don't have to type
+instructions manually every time.
+
+> **Example:** You type `/code-review` → Claude automatically loads the reviewer agent,
+> applies review rules, and returns a structured PASS/WARN/FAIL report.
+>
+> Like a keyboard shortcut for a multi-step process.
+
+### Rules — The Always-On Policies
+Rules in `rules/` are loaded at **every session** — you never have to remind Claude.
+
+> **Example:** The `security.md` rule says *"never hardcode secrets"*. So for any code
+> Claude writes, it will always use environment variables for credentials automatically.
+>
+> Like company policies every employee follows without being told.
+
+### Hooks — The Automated Checks
+Hooks fire automatically **before or after** Claude performs an action — no user input needed.
+
+> **Example:** Every time Claude edits a `.tf` file, a hook reminds it to run
+> `terraform fmt`. Every time a bash command is about to run, a hook scans it for
+> accidental secrets (`AKIA...`, `sk-...`).
+>
+> Like a spell-checker that runs automatically when you save a document.
+
+### Memory — The Notebook
+Notes that persist between conversations so Claude doesn't forget lessons.
+
+> **Example:** You once discovered a Kyverno CEL gotcha (backtick-escaping label keys).
+> That gets saved to memory. Next week in a new conversation, Claude already knows it.
+>
+> Like a notebook Claude carries everywhere.
+
+### Quick Reference Table
+
+| Concept | When it activates | What it does |
+|---|---|---|
+| **Skill** | Task matches a domain | Loads domain expertise before responding |
+| **Agent** | Specialist work needed | Delegates to a fresh focused expert |
+| **Command** | You type `/something` | Runs a predefined multi-step workflow |
+| **Rule** | Always, every session | Enforces baseline standards automatically |
+| **Hook** | After a file write or command | Runs automated quality/security checks |
+| **Memory** | Always | Remembers patterns and lessons across sessions |
+
+---
+
 ## How It Works
 
 ### 1. Skills — Primary Workflow Surface
