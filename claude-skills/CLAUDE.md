@@ -44,19 +44,21 @@ I am an IT infrastructure engineer specialising in:
 - `has()` only works with dot access — use `"key" in map` for map keys
 - `capabilities.drop` is atomic list — use JSONPatch mutations
 - Guard cluster-scoped resources with `has(request.namespace)`
+- PolicyException "not processed" warning is cosmetic when `enablePolicyException=true`
+- `dyn()` cannot contain nested map types in GeneratingPolicy metadata — remove labels as workaround
 
 ## Preferred Patterns
 - ArgoCD: App-of-Apps + ApplicationSet with generators
 - AKS: node pools per workload class, UAMI for workload identity
-- Terraform: `azurerm` provider ≥ 3.x, remote state in Azure Storage
+- Terraform: `azurerm` provider ≥ 4.x, remote state in Azure Storage
 - Pipelines: reusable YAML templates, approval gates for prod
 - Monitoring: Prometheus ServiceMonitor + PrometheusRule CRDs
 
 ## ECC Harness Layout (`~/.claude/`)
 
 ```
-agents/       # 22 specialised subagents (9 IT + 13 general)
-skills/       # 8 skill directories (each with SKILL.md)
+agents/       # 36+ specialised subagents (IT infrastructure + general engineering)
+skills/       # 71 skill directories (each with SKILL.md)
 commands/     # slash commands: /plan /k8s-review /tf-review /tdd /code-review ...
 rules/common/ # 8 always-apply rule files
 contexts/     # /dev (build) · /review (audit) · /research · /ops (incident)
