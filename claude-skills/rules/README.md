@@ -14,7 +14,8 @@ rules/
 │   ├── patterns.md
 │   ├── performance.md
 │   ├── security.md
-│   └── testing.md
+│   ├── testing.md
+│   └── zero-trust-agentic.md  # Zero Trust for autonomous agents/MCP/automation (extends security.md)
 ├── golang/
 │   └── rules.md
 ├── php/
