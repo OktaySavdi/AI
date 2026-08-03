@@ -26,4 +26,16 @@ echo "║           No secrets in ConfigMap │ CEL: no quoted keys  ║" >&2
 echo "╚══════════════════════════════════════════════════════════╝" >&2
 echo "" >&2
 
+if [[ -f "tasks/lessons.md" ]]; then
+  LESSON_COUNT=$(grep -c '^## ' "tasks/lessons.md" 2>/dev/null || echo 0)
+  echo "[Lessons] tasks/lessons.md has ${LESSON_COUNT} recorded pattern(s) — review before repeating past mistakes." >&2
+  echo "" >&2
+fi
+
+if [[ -f "tasks/todo.md" ]] && grep -q '\[ \]' "tasks/todo.md" 2>/dev/null; then
+  OPEN_COUNT=$(grep -c '\[ \]' "tasks/todo.md" 2>/dev/null || echo 0)
+  echo "[Todo] tasks/todo.md has ${OPEN_COUNT} open item(s) from a previous session." >&2
+  echo "" >&2
+fi
+
 exit 0

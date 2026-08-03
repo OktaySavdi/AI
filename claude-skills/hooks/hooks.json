@@ -75,6 +75,16 @@
       ]
     },
     {
+      "description": "Lessons capture reminder — nudge tasks/lessons.md updates after corrections (Self-Improvement Loop)",
+      "event": "Stop",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.claude/hooks/scripts/lessons-capture-reminder.sh"
+        }
+      ]
+    },
+    {
       "description": "Pre-compact state snapshot — save state before context compaction",
       "event": "PreCompact",
       "hooks": [

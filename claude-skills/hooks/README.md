@@ -14,6 +14,8 @@ The `hooks.json` file registers all hooks. Hooks fire on `PreToolUse` or `PostTo
 | `k8s-dryrun-reminder.sh` | PostToolUse (Write) | Remind to dry-run K8s manifests |
 | `tf-fmt-reminder.sh` | PostToolUse (Write) | Remind to run `terraform fmt` |
 | `latest-tag-check.sh` | PostToolUse (Write) | Warn when `:latest` tag used |
+| `session-start.sh` | SessionStart | Show context banner + flag open `tasks/todo.md`/`tasks/lessons.md` items |
+| `lessons-capture-reminder.sh` | Stop | Nudge capturing corrections into `tasks/lessons.md` (Self-Improvement Loop, see CLAUDE.md). Templates: `~/.claude/templates/{lessons,todo}.md` |
 
 ## Hook Exit Codes
 
